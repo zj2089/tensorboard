@@ -32,7 +32,7 @@ class _EventGenerator(object):
   """Class that can add_events and then yield them back.
 
   Satisfies the EventGenerator API required for the EventAccumulator.
-  Satisfies the EventWriter API required to create a tf.summary.FileWriter.
+  Satisfies the EventWriter API required to create a SummaryWriter.
 
   Has additional convenience methods for adding test events.
   """
