@@ -370,5 +370,22 @@ def start_reloading_multiplexer(multiplexer, path_to_run, load_interval):
 
 def get_tensorboard_tag():
   """Read the TensorBoard TAG number, and return it or an empty string."""
-  tag = tf.resource_loader.load_resource('tensorboard/TAG').strip()
-  return tag
+  return hacky_loader('TAG').strip()
+
+
+def hacky_loader(path):
+  """Load an asset from the tensorboard directory, in a platform-generic way."""
+  try:
+    # load_resource fetches resources relative to the tensorflow directory.
+    # Thus, we must go down 1 level (into the tensorboard directory). This case
+    # usually applies for running within Google.
+    return tf.resource_loader.load_resource(os.path.join('tensorboard', path))
+  except IOError:
+    # We may be trying to load resources relative to the directory containing
+    # the TensorBoard binary (like in most of the open source world). Fetch the
+    # resource locally.
+    tensorboard_root = os.path.join(os.path.dirname(__file__), os.pardir)
+    path = os.path.join(tensorboard_root, path)
+    path = os.path.abspath(path)
+    with open(path, 'rb') as f:
+      return f.read()
